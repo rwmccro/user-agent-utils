@@ -206,7 +206,17 @@ public enum OperatingSystem {
 		// combine manufacturer and version id to one unique id. 
 		this.id =  (short) ( ( manufacturer.getId() << 8) + (byte) versionId);
 		this.name = name;
+		if(aliases != null){
+			for(int i = 0; i < aliases.length; i++){
+				aliases[i] = aliases[i].toLowerCase();
+			}
+		}
 		this.aliases = aliases;
+		if(exclude != null){
+			for(int i = 0; i < exclude.length; i++){
+				exclude[i] = exclude[i].toLowerCase();
+			}
+		}
 		this.excludeList = exclude;
 		this.deviceType = deviceType;
 		if (versionRegexString != null) { // not implemented yet
@@ -272,9 +282,13 @@ public enum OperatingSystem {
 	 */
 	public boolean isInUserAgentString(String agentString)
 	{		
+		return checkAliases(agentString.toLowerCase());
+	}
+	
+	private boolean checkAliases(String lcAgentString){
 		for (String alias : aliases)
 		{
-			if (agentString.toLowerCase().indexOf(alias.toLowerCase()) != -1)
+			if (lcAgentString.indexOf(alias) != -1)
 				return true;
 		}	
 		return false;
@@ -290,7 +304,7 @@ public enum OperatingSystem {
 	{
 		if (excludeList != null) {
 			for (String exclude : excludeList) {
-				if (agentString.toLowerCase().indexOf(exclude.toLowerCase()) != -1)
+				if (agentString.indexOf(exclude) != -1)
 					return true;
 			}
 		}
@@ -336,9 +350,10 @@ public enum OperatingSystem {
 	 */
 	public static OperatingSystem parseUserAgentString(String agentString, List<OperatingSystem> operatingSystems)
 	{
+		String lcAgentString = agentString.toLowerCase();
 		for (OperatingSystem operatingSystem : operatingSystems)
 		{
-			OperatingSystem match = operatingSystem.checkUserAgent(agentString);
+			OperatingSystem match = operatingSystem.checkUserAgent(lcAgentString);
 			if (match != null) {
 				return match; // either current operatingSystem or a child object
 			}

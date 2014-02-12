@@ -248,7 +248,17 @@ public enum Browser {
 		this.name = name;
 		this.parent = parent;
 		this.children = new ArrayList<Browser>();
+		if(aliases != null){
+			for(int i = 0; i < aliases.length; i++){
+				aliases[i] = aliases[i].toLowerCase();
+			}
+		}
 		this.aliases = aliases;
+		if(exclude != null){
+			for(int i = 0; i < exclude.length; i++){
+				exclude[i] = exclude[i].toLowerCase();
+			}
+		}
 		this.excludeList = exclude;
 		this.browserType = browserType;
 		this.manufacturer = manufacturer;
@@ -344,9 +354,13 @@ public enum Browser {
 	 */
 	public boolean isInUserAgentString(String agentString)
 	{
+		return checkAliases(agentString.toLowerCase());
+	}
+	
+	private boolean checkAliases(String lcAgentString){
 		for (String alias : aliases)
 		{
-			if (agentString.toLowerCase().indexOf(alias.toLowerCase()) != -1)
+			if (lcAgentString.indexOf(alias) != -1)
 				return true;
 		}
 		return false;
@@ -362,7 +376,7 @@ public enum Browser {
 	{
 		if (excludeList != null) {
 			for (String exclude : excludeList) {
-				if (agentString.toLowerCase().indexOf(exclude.toLowerCase()) != -1)
+				if (agentString.indexOf(exclude) != -1)
 					return true;
 			}
 		}
@@ -370,7 +384,7 @@ public enum Browser {
 	}
 	
 	private Browser checkUserAgent(String agentString) {
-		if (this.isInUserAgentString(agentString)) {
+		if (this.checkAliases(agentString)) {
 			
 			if (this.children.size() > 0) {
 				for (Browser childBrowser : this.children) {
@@ -416,8 +430,9 @@ public enum Browser {
 	 */
 	public static Browser parseUserAgentString(String agentString, List<Browser> browsers)
 	{
+		String lcAgentString = agentString.toLowerCase();
 		for (Browser browser : browsers) {
-			Browser match = browser.checkUserAgent(agentString);
+			Browser match = browser.checkUserAgent(lcAgentString);
 			if (match != null) {
 				return match; // either current operatingSystem or a child object
 			}
