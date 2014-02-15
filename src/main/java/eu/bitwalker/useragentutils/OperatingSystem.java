@@ -312,7 +312,7 @@ public enum OperatingSystem {
 	}
 		
 	private OperatingSystem checkUserAgent(String agentString) {
-		if (this.isInUserAgentString(agentString)) {
+		if (this.checkAliases(agentString)) {
 			if (this.children.size() > 0) {
 				for (OperatingSystem childOperatingSystem : this.children) {
 					OperatingSystem match = childOperatingSystem.checkUserAgent(agentString);
